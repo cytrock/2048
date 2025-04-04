@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>36宫格2048 - 马卡龙动物版</title>
+    <style>
+        /* 马卡龙色彩方案 */
+        body {
+            display: flex;
+            justify-content: center;
+            background: #FFF8DC;
+            /* 淡黄色 */
+            font-family: 'Comic Sans MS', Arial, sans-serif;
+            color: #5a4a5a;
+        }
+
+        .game-container {
+            position: relative;
+            margin-top: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #FFF8DC;
+            /* 淡黄色 */
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 93px);
+            /* 从6改为5 */
+            grid-template-rows: repeat(5, 93px);
+            /* 从6改为5 */
+            gap: 8px;
+            background: #F0E6C8;
+            /* 深一点的淡黄色 */
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(160, 120, 160, 0.2);
+            width: fit-content;
+            /* 添加这行确保容器宽度适应内容 */
+            margin: 0 auto;
+            /* 添加这行使容器居中 */
+        }
+
+        .cell {
+            border-radius: 8px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            font-size: 20px;
+            font-weight: bold;
+            color: #5a4a5a;
+            transition: all 0.2s ease;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell span {
+            z-index: 2;
+            text-shadow: 0px 0px 5px white, 0px 0px 5px white, 0px 0px 5px white;
+            font-weight: bold;
+            padding: 2px 4px;
+            margin: 2px;
+        }
+
+        /* 动物背景的数字方案 */
+        .cell-2 {
+            background-color: #fce8e8;
+            /* 浅粉色 - 兔子背景 */
+            background-image: url('image/bunny.jpeg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cell-4 {
+            background-color: #e8fcf8;
+            /* 浅绿色 - 鸭子背景 */
+            background-image: url('image/duck.jpeg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cell-8 {
+            background-color: #fcf8e8;
+            /* 浅黄色 - 狗狗背景 */
+            background-image: url('image/puppy.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #5a4a3a;
+        }
+
+        .cell-16 {
+            background-color: #f8e8fc;
+            /* 淡紫色 - 猫咪背景 */
+            background-image: url('image/cat.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #4a3a5a;
+        }
+
+        .cell-32 {
+            background-color: #e8f8fc;
+            /* 浅蓝色 - 企鹅背景 */
+            background-image: url('image/otter pup.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #3a4a5a;
+        }
+
+        .cell-64 {
+            background-color: #fcf0e8;
+            /* 橙色 - 狐狸背景 */
+            background-image: url('./image/fox.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #5a3a2a;
+        }
+
+        .cell-128 {
+            background-color: #e8ecfc;
+            /* 淡蓝色 - 熊猫背景 */
+            background-image: url('image/panda.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #3a3a5a;
+            font-size: 18px;
+        }
+
+        .cell-256 {
+            background-color: #f0fce8;
+            /* 淡绿色 - 青蛙背景 */
+            background-image: url('image/deer.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #3a5a2a;
+        }
+
+        .cell-512 {
+            background-color: #fce8ec;
+            /* 粉红色 - 猪背景 */
+            background-image: url('image/hedgehog.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #5a2a3a;
+        }
+
+        .cell-1024 {
+            background-color: #c8e8f0;
+            /* 蓝绿色 - 鱼背景 */
+            background-image: url('image/alpaca.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #2a3a5a;
+            font-size: 16px;
+        }
+
+        .cell-2048 {
+            background-color: #f8d8c8;
+            /* 橙色 - 狮子背景 */
+            background-image: url('image/lion.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #5a2a1a;
+        }
+
+        .cell-4096 {
+            background-color: #e8d8f8;
+            /* 紫色 - 大象背景 */
+            background-image: url('image/elephant.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #3a1a5a;
+        }
+
+        .cell-8192 {
+            background-color: #c8f8d8;
+            /* 薄荷绿 - 变色龙背景 */
+            background-image: url('image/lamb.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #1a5a3a;
+        }
+
+        .cell-16384 {
+            background-color: #f8f8d8;
+            /* 淡黄色 - 长颈鹿背景 */
+            background-image: url('image/bear.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #5a5a1a;
+            font-size: 14px;
+        }
+
+        .cell-32768 {
+            background-color: #d8c8e0;
+            /* 淡紫色 - 蝴蝶背景 */
+            background-image: url('image/squirrel.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #3a1a5a;
+            font-size: 14px;
+        }
+
+        .cell-65536 {
+            background-color: #f0c8d8;
+            /* 粉色 - 孔雀背景 */
+            background-image: url('image/tiger.jpeg');
+            background-size: cover;
+            background-position: center;
+            color: #5a1a3a;
+            font-size: 14px;
+        }
+
+        .score-panel {
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.5rem;
+            color: #5a4a5a;
+        }
+
+        .scores {
+            display: flex;
+            justify-content: space-between;
+            max-width: 576px;
+            margin: 0 auto;
+        }
+
+        .score-box {
+            background: linear-gradient(145deg, #F0E6C8, #FFF8DC);
+            /* 淡黄色渐变 */
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: #5a4a5a;
+            box-shadow: 0 4px 12px rgba(160, 120, 160, 0.2);
+        }
+
+        .score-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* 功能按钮 */
+        .control-panel {
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #F0E6C8, #FFF8DC);
+            /* 淡黄色渐变 */
+            border: none;
+            border-radius: 12px;
+            color: #5a4a5a;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(160, 120, 160, 0.2);
+        }
+
+        button:hover {
+            background: linear-gradient(145deg, #FFF8DC, #FFFFF0);
+            /* 更亮的淡黄色渐变 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(160, 120, 160, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 248, 220, 0.85);
+            /* 半透明淡黄色 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            animation: fadeIn 0.8s ease;
+            border-radius: 12px;
+            box-shadow: inset 0 0 30px rgba(160, 120, 160, 0.4);
+        }
+
+        .game-over h2 {
+            font-size: 3rem;
+            color: #5a4a5a;
+            margin-bottom: 0;
+            text-shadow: 2px 2px 8px rgba(160, 120, 160, 0.4);
+        }
+
+        .game-over p {
+            font-size: 1.5rem;
+            color: #5a4a5a;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 添加动画效果 */
+        .tile-new {
+            animation: appear 0.3s ease-in-out;
+        }
+
+        @keyframes appear {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 优化得分特效 */
+        .score-animation {
+            position: absolute;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff69b4;
+            text-shadow: 0px 0px 5px white, 0px 0px 10px rgba(255, 105, 180, 0.5);
+            pointer-events: none;
+            z-index: 100;
+            animation: floatUp 1.5s ease-out forwards;
+            transform-origin: center;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(0.8) rotate(-10deg);
+                opacity: 0;
+            }
+
+            20% {
+                transform: translateY(-20px) scale(1.2) rotate(0deg);
+                opacity: 1;
+            }
+
+            40% {
+                transform: translateY(-40px) scale(1.1) rotate(5deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-80px) scale(1) rotate(0deg);
+                opacity: 0;
+            }
+        }
+
+        /* 添加合并特效 */
+        .merge-animation {
+            animation: merge 0.3s ease-in-out;
+            position: relative;
+        }
+
+        @keyframes merge {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 105, 180, 0.5);
+            }
+
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 105, 180, 0.5);
+            }
+        }
+
+        /* 添加连击特效 */
+        .combo-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff69b4;
+            text-shadow: 0px 0px 5px white, 0px 0px 10px rgba(255, 105, 180, 0.5);
+            animation: combo 1s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes combo {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* 添加得分闪光效果 */
+        .score-flash {
+            animation: scoreFlash 0.5s ease-out;
+        }
+
+        @keyframes scoreFlash {
+            0% {
+                transform: scale(1);
+                color: #5a4a5a;
+            }
+
+            50% {
+                transform: scale(1.1);
+                color: #ff69b4;
+            }
+
+            100% {
+                transform: scale(1);
+                color: #5a4a5a;
+            }
+        }
+
+        /* 添加操作反馈提示 */
+        .move-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(211, 184, 211, 0.9);
+            color: #5a4a5a;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 12px rgba(160, 120, 160, 0.3);
+        }
+
+        .move-notification.show {
+            opacity: 1;
+        }
+
+        /* 音乐控制 */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 248, 220, 0.8);
+            /* 半透明淡黄色 */
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(160, 120, 160, 0.3);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+        }
+
+        .music-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* 添加难度选择样式 */
+        .difficulty-selector {
+            margin: 1rem 0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .difficulty-btn {
+            padding: 8px 16px;
+            background: linear-gradient(145deg, #c8a8c8, #e8c8e8);
+            border: none;
+            border-radius: 8px;
+            color: #5a4a5a;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(145deg, #d8b8d8, #f8d8f8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(160, 120, 160, 0.3);
+        }
+
+        /* 添加统计信息样式 */
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: linear-gradient(145deg, #F0E6C8, #FFF8DC);
+            /* 淡黄色渐变 */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(160, 120, 160, 0.2);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #5a4a5a;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #5a4a5a;
+            text-transform: uppercase;
+        }
+
+        /* 添加提示样式 */
+        .hint-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 12px;
+        }
+
+        .hint-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .hint-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="score-panel">
+            <h1>25-Grid 2048 - Macaron Animal Edition</h1>
+            <div class="scores">
+                <div class="score-box">
+                    <div class="score-title">Current Score</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-title">Best Score</div>
+                    <div class="score-value" id="best-score">0</div>
+                </div>
+            </div>
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <div class="stat-value" id="moves-count">0</div>
+                    <div class="stat-label">Moves</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time-played">00:00</div>
+                    <div class="stat-label">Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="highest-tile">0</div>
+                    <div class="stat-label">Highest Tile</div>
+                </div>
+            </div>
+        </div>
+        <div class="control-panel">
+            <button onclick="newGame()">New Game</button>
+        </div>
+        <div class="grid-container" id="grid"></div>
+        <div id="move-notification" class="move-notification">Invalid Move</div>
+        <div class="music-control" id="music-toggle">
+            <svg class="music-icon" viewBox="0 0 24 24" fill="none" stroke="#5a4a5a" stroke-width="2">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <!-- 添加音效和音乐 -->
+    <audio id="move-sound">
+        <source src="audio/move.mp3" type="audio/mpeg">
+        <source src="audio/move.ogg" type="audio/ogg">
+    </audio>
+
+    <audio id="merge-sound">
+        <source src="audio/merge.mp3" type="audio/mpeg">
+        <source src="audio/merge.ogg" type="audio/ogg">
+    </audio>
+
+    <audio id="game-over-sound">
+        <source src="audio/gameover.mp3" type="audio/mpeg">
+        <source src="audio/gameover.ogg" type="audio/ogg">
+    </audio>
+
+    <script>
+        // 游戏参数
+        const GRID_SIZE = 5;
+        let cells = [];
+        let grid = [];
+        let score = 0;
+        let bestScore = localStorage.getItem('bestScore') || 0;
+        let gameIsOver = false;
+        let notificationTimeout = null;
+        let soundEnabled = true;
+        let movesCount = 0;
+        let startTime = null;
+        let gameTimer = null;
+        let highestTile = 0;
+        let difficulty = 'easy';
+        let comboCount = 0;
+        let lastMergeTime = 0;
+        const COMBO_TIMEOUT = 1000; // 1秒内连续合并算连击
+        let activeAnimations = new Set(); // 跟踪活动动画
+
+        // 音频元素
+        const moveSound = document.getElementById('move-sound');
+        const mergeSound = document.getElementById('merge-sound');
+        const gameOverSound = document.getElementById('game-over-sound');
+
+        // 设置音频音量
+        moveSound.volume = 0.5;
+        mergeSound.volume = 0.5;
+        gameOverSound.volume = 0.5;
+
+        // 声音控制
+        document.getElementById('music-toggle').addEventListener('click', toggleSound);
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('music-toggle').style.opacity = soundEnabled ? 1 : 0.5;
+        }
+
+        // 播放音效的辅助函数
+        function playSound(sound) {
+            if (soundEnabled) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('Failed to play sound'));
+            }
+        }
+
+        // 初始化网格UI
+        function initGrid() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            cells = [];
+
+            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+
+                // 为每个单元格添加数字显示元素
+                const span = document.createElement('span');
+                cell.appendChild(span);
+
+                gridElement.appendChild(cell);
+                cells.push(cell);
+            }
+
+            // 初始化数据网格
+            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+        }
+
+        // 1. 更新playScoreAnimation函数来改进特效显示
+        function playScoreAnimation(points, x, y) {
+            // 清理过期的动画
+            activeAnimations.forEach(anim => {
+                if (!document.body.contains(anim)) {
+                    activeAnimations.delete(anim);
+                }
+            });
+
+            // 创建得分动画元素
+            const scoreAnim = document.createElement('div');
+            scoreAnim.className = 'score-animation';
+            scoreAnim.textContent = '+' + points;
+
+            // 更精确的位置设置 - 直接在合并的方块上方
+            scoreAnim.style.left = (x - 20) + 'px';
+            scoreAnim.style.top = (y - 20) + 'px';
+
+            document.body.appendChild(scoreAnim);
+            activeAnimations.add(scoreAnim);
+
+            // 播放合并音效
+            playSound(mergeSound);
+
+            // 检查是否连击
+            const now = Date.now();
+            if (now - lastMergeTime < COMBO_TIMEOUT) {
+                comboCount++;
+                if (comboCount > 1) {
+                    showComboAnimation(comboCount);
+                }
+            } else {
+                comboCount = 1;
+            }
+            lastMergeTime = now;
+
+            // 动画结束后移除元素
+            setTimeout(() => {
+                if (document.body.contains(scoreAnim)) {
+                    document.body.removeChild(scoreAnim);
+                    activeAnimations.delete(scoreAnim);
+                }
+            }, 1500);
+        }
+
+        // 显示连击动画
+        function showComboAnimation(count) {
+            const comboAnim = document.createElement('div');
+            comboAnim.className = 'combo-animation';
+            comboAnim.textContent = count + ' Combo!';
+            document.querySelector('.game-container').appendChild(comboAnim);
+
+            setTimeout(() => {
+                document.querySelector('.game-container').removeChild(comboAnim);
+            }, 1000);
+        }
+
+
+        // 更新游戏统计
+        function updateStats() {
+            document.getElementById('moves-count').textContent = movesCount;
+            document.getElementById('highest-tile').textContent = highestTile;
+        }
+
+        // 更新游戏时间
+        function updateGameTime() {
+            if (!startTime) return;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('time-played').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 检查成就
+        function checkAchievements() {
+            if (highestTile >= 2048) {
+                document.getElementById('first-2048').classList.remove('locked');
+            }
+            if (movesCount >= 1000) {
+                document.getElementById('master-mover').classList.remove('locked');
+            }
+        }
+
+
+        // 开始新游戏
+        function newGame() {
+            // 清除之前的游戏状态
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+
+            // 移除游戏结束显示
+            const gameOverElement = document.querySelector('.game-over');
+            if (gameOverElement) {
+                gameOverElement.remove();
+            }
+
+            initGrid();
+            score = 0;
+            movesCount = 0;
+            gameIsOver = false;
+            startTime = Date.now();
+            highestTile = 0;
+
+
+            // 始终使用简单难度 (2个初始方块)
+            let initialTiles = 2;
+
+            for (let i = 0; i < initialTiles; i++) {
+                addNewTile();
+            }
+
+            updateScore();
+            updateStats();
+
+            // 启动游戏计时器
+            gameTimer = setInterval(updateGameTime, 1000);
+        }
+
+        // 添加新块
+        function addNewTile() {
+            // 找出所有空白位置
+            const emptyPositions = [];
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (grid[row][col] === 0) {
+                        emptyPositions.push({ row, col });
+                    }
+                }
+            }
+
+            if (emptyPositions.length === 0) return false;
+
+            // 随机选择一个空位置
+            const position = emptyPositions[Math.floor(Math.random() * emptyPositions.length)];
+
+            // 90%几率是2，10%几率是4
+            // 根据最高方块值动态调整生成概率
+            let value;
+            const highTileThreshold = highestTile >= 512 ? 3 : (highestTile >= 128 ? 2 : 1);
+            const rng = Math.random();
+
+            // 基础概率设置
+            let prob2 = 0.8; // 生成2的基础概率
+            let prob4 = 0.15; // 生成4的基础概率
+            let prob8 = 0.05; // 生成8的基础概率
+
+            // 根据游戏进度调整概率
+            if (highestTile >= 64) {
+                prob2 = 0.7;
+                prob4 = 0.2;
+                prob8 = 0.1;
+            }
+            if (highestTile >= 256) {
+                prob2 = 0.6;
+                prob4 = 0.25;
+                prob8 = 0.15;
+            }
+            if (highestTile >= 1024) {
+                prob2 = 0.5;
+                prob4 = 0.3;
+                prob8 = 0.2;
+            }
+
+            // 每200个移动后，额外调整概率
+            if (movesCount > 200) {
+                prob2 -= 0.1;
+                prob4 += 0.05;
+                prob8 += 0.05;
+            }
+
+            // 确保概率总和为1
+            const probTotal = prob2 + prob4 + prob8;
+            prob2 /= probTotal;
+            prob4 /= probTotal;
+            // prob8不需要调整，因为它就是剩余的概率
+
+            // 根据概率范围决定生成的值
+            if (rng < prob2) {
+                value = 2;
+            } else if (rng < prob2 + prob4) {
+                value = 4;
+            } else {
+                value = 8;
+            }
+
+            // 每500个移动后，有极小概率(0.5%)生成16
+            if (movesCount > 500 && Math.random() < 0.005) {
+                value = 16;
+            }
+            grid[position.row][position.col] = value;
+
+            // 更新UI
+            const cellIndex = position.row * GRID_SIZE + position.col;
+            // 设置值到span元素
+            const span = cells[cellIndex].querySelector('span');
+            span.textContent = value || '';
+            cells[cellIndex].className = value ? `cell cell-${value} tile-new` : 'cell';
+
+            return true;
+        }
+
+        // 更新分数
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+            if (score > bestScore) {
+                bestScore = score;
+                document.getElementById('best-score').textContent = bestScore;
+                localStorage.setItem('bestScore', bestScore);
+            } else {
+                document.getElementById('best-score').textContent = bestScore;
+            }
+        }
+
+        // 更新网格UI
+        function updateGridUI() {
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const value = grid[row][col];
+                    const cellIndex = row * GRID_SIZE + col;
+
+                    // 设置值到span元素
+                    const span = cells[cellIndex].querySelector('span');
+                    span.textContent = value || '';
+                    cells[cellIndex].className = value ? `cell cell-${value}` : 'cell';
+                }
+            }
+        }
+
+        // 显示操作无效通知
+        function showInvalidMoveNotification(message) {
+            const notification = document.getElementById('move-notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+
+            // 清除之前的超时
+            if (notificationTimeout) {
+                clearTimeout(notificationTimeout);
+            }
+
+            // 2秒后隐藏
+            notificationTimeout = setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        // 5. 修改move函数，移除全局特效显示
+        function move(direction) {
+            if (gameIsOver) return false;
+
+            // 保存之前的状态
+            const previousGrid = grid.map(row => [...row]);
+            let moved = false;
+            let totalScore = 0; // 此次移动的总得分
+
+            // 根据方向处理移动
+            switch (direction) {
+                case 'right':
+                    const rightResult = moveRight(totalScore);
+                    moved = rightResult.moved;
+                    totalScore = rightResult.score;
+                    break;
+                case 'down':
+                    const downResult = moveDown(totalScore);
+                    moved = downResult.moved;
+                    totalScore = downResult.score;
+                    break;
+                case 'left':
+                    const leftResult = moveLeft(totalScore);
+                    moved = leftResult.moved;
+                    totalScore = leftResult.score;
+                    break;
+                case 'up':  // 添加这个case
+                    const upResult = moveUp(totalScore);
+                    moved = upResult.moved;
+                    totalScore = upResult.score;
+                    break;
+            }
+
+            if (moved) {
+                movesCount++;
+                updateStats();
+
+                // 播放移动音效
+                playSound(moveSound);
+
+                // 更新最高方块
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        const value = grid[row][col];
+                        if (value > highestTile) {
+                            highestTile = value;
+                            updateStats();
+                        }
+                    }
+                }
+
+                // 更新得分 - 注意这里不再显示统一的得分特效
+                if (totalScore > 0) {
+                    score += totalScore;
+
+                    // 添加得分闪光效果
+                    const scoreElement = document.getElementById('score');
+                    scoreElement.classList.add('score-flash');
+                    setTimeout(() => {
+                        scoreElement.classList.remove('score-flash');
+                    }, 500);
+                }
+
+                updateScore();
+                updateGridUI();
+                addNewTile();
+
+                // 检查成就
+                checkAchievements();
+
+                // 检查游戏是否结束
+                if (isGameOver()) {
+                    gameIsOver = true;
+                    showGameOver();
+                }
+            } else {
+                showInvalidMoveNotification('Invalid Move');
+            }
+
+            return moved;
+        }
+
+        function moveUp(totalScore = 0) {
+            let moved = false;
+            let score = 0;
+
+            for (let col = 0; col < GRID_SIZE; col++) {
+                // 收集这一列中的所有非零数字
+                let nonZeros = [];
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (grid[row][col] !== 0) {
+                        nonZeros.push({
+                            value: grid[row][col],
+                            originalRow: row
+                        });
+                    }
+                }
+
+                // 如果这一列没有非零数字，继续下一列
+                if (nonZeros.length === 0) continue;
+
+                // 合并相同的相邻数字
+                let merged = [];
+                let i = 0;
+                while (i < nonZeros.length) {
+                    if (i + 1 < nonZeros.length && nonZeros[i].value === nonZeros[i + 1].value) {
+                        const mergeValue = nonZeros[i].value * 2;
+                        merged.push({
+                            value: mergeValue,
+                            merged: true,
+                            originalRow1: nonZeros[i].originalRow,
+                            originalRow2: nonZeros[i + 1].originalRow
+                        });
+
+                        // 计算合并得分
+                        score += mergeValue;
+
+                        i += 2;
+                    } else {
+                        merged.push({
+                            value: nonZeros[i].value,
+                            merged: false,
+                            originalRow: nonZeros[i].originalRow
+                        });
+                        i++;
+                    }
+                }
+
+                // 检查这一列是否有变化
+                let originalColumn = [];
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    originalColumn.push(grid[row][col]);
+                }
+
+                // 清除这一列并用合并后的数据填充
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (row < merged.length) {
+                        const newValue = merged[row].value;
+
+                        grid[row][col] = newValue;
+
+                        // 如果是合并生成的新值，添加合并动画
+                        if (merged[row].merged) {
+                            const cellIndex = row * GRID_SIZE + col;
+                            setTimeout(() => {
+                                cells[cellIndex].classList.add('merge-animation');
+
+                                // 计算合并方块的位置并显示动画
+                                const rect = cells[cellIndex].getBoundingClientRect();
+                                playScoreAnimation(newValue, rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+                                // 移除动画类
+                                setTimeout(() => {
+                                    cells[cellIndex].classList.remove('merge-animation');
+                                }, 300);
+                            }, 50);
+                        }
+                    } else {
+                        grid[row][col] = 0;
+                    }
+                }
+
+                // 检查是否有变化
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (originalColumn[row] !== grid[row][col]) {
+                        moved = true;
+                        break;
+                    }
+                }
+            }
+
+            return { moved, score };
+        }
+
+        // 2. 更新moveRight函数，在合并位置显示动画
+        function moveRight(totalScore = 0) {
+            let moved = false;
+            let score = 0;
+
+            for (let row = 0; row < GRID_SIZE; row++) {
+                // 收集这一行中的所有非零数字
+                let nonZeros = [];
+                for (let col = GRID_SIZE - 1; col >= 0; col--) {
+                    if (grid[row][col] !== 0) {
+                        nonZeros.push({
+                            value: grid[row][col],
+                            originalCol: col // 记录原始位置用于动画
+                        });
+                    }
+                }
+
+                if (nonZeros.length === 0) continue;
+
+                // 合并相同的相邻数字
+                let merged = [];
+                let i = 0;
+                while (i < nonZeros.length) {
+                    if (i + 1 < nonZeros.length && nonZeros[i].value === nonZeros[i + 1].value) {
+                        const mergeValue = nonZeros[i].value * 2;
+                        merged.push({
+                            value: mergeValue,
+                            merged: true,
+                            originalCol1: nonZeros[i].originalCol,
+                            originalCol2: nonZeros[i + 1].originalCol
+                        });
+
+                        // 关键修改：合并时直接计算得分，等于合并后的数值
+                        score += mergeValue;
+
+                        i += 2;
+                    } else {
+                        merged.push({
+                            value: nonZeros[i].value,
+                            merged: false,
+                            originalCol: nonZeros[i].originalCol
+                        });
+                        i++;
+                    }
+                }
+
+                // 检查这一行是否有变化
+                let originalRow = [...grid[row]];
+
+                // 清除这一行并用合并后的数据填充
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (col < merged.length) {
+                        const newValue = merged[col].value;
+                        const newPosition = GRID_SIZE - 1 - col;
+                        const oldValue = grid[row][newPosition];
+
+                        grid[row][newPosition] = newValue;
+
+                        // 如果是合并生成的新值，添加合并动画
+                        if (merged[col].merged) {
+                            const cellIndex = row * GRID_SIZE + newPosition;
+                            setTimeout(() => {
+                                cells[cellIndex].classList.add('merge-animation');
+
+                                // 计算合并方块的位置并显示动画
+                                const rect = cells[cellIndex].getBoundingClientRect();
+                                playScoreAnimation(newValue, rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+                                // 移除动画类
+                                setTimeout(() => {
+                                    cells[cellIndex].classList.remove('merge-animation');
+                                }, 300);
+                            }, 50); // 稍微延迟以确保DOM更新
+                        }
+                    } else {
+                        grid[row][GRID_SIZE - 1 - col] = 0;
+                    }
+                }
+
+                // 检查是否有变化
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (originalRow[col] !== grid[row][col]) {
+                        moved = true;
+                        break;
+                    }
+                }
+            }
+
+            return { moved, score };
+        }
+
+
+        // 3. 更新moveDown函数，在合并位置显示动画
+        function moveDown(totalScore = 0) {
+            let moved = false;
+            let score = 0;
+
+            for (let col = 0; col < GRID_SIZE; col++) {
+                // 收集这一列中的所有非零数字
+                let nonZeros = [];
+                for (let row = GRID_SIZE - 1; row >= 0; row--) {
+                    if (grid[row][col] !== 0) {
+                        nonZeros.push({
+                            value: grid[row][col],
+                            originalRow: row
+                        });
+                    }
+                }
+
+                // 如果这一列没有非零数字，继续下一列
+                if (nonZeros.length === 0) continue;
+
+                // 合并相同的相邻数字
+                let merged = [];
+                let i = 0;
+                while (i < nonZeros.length) {
+                    if (i + 1 < nonZeros.length && nonZeros[i].value === nonZeros[i + 1].value) {
+                        const mergeValue = nonZeros[i].value * 2;
+                        merged.push({
+                            value: mergeValue,
+                            merged: true,
+                            originalRow1: nonZeros[i].originalRow,
+                            originalRow2: nonZeros[i + 1].originalRow
+                        });
+
+                        // 计算合并得分
+                        score += mergeValue;
+
+                        i += 2;
+                    } else {
+                        merged.push({
+                            value: nonZeros[i].value,
+                            merged: false,
+                            originalRow: nonZeros[i].originalRow
+                        });
+                        i++;
+                    }
+                }
+
+                // 检查这一列是否有变化
+                let originalColumn = [];
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    originalColumn.push(grid[row][col]);
+                }
+
+                // 清除这一列并用合并后的数据填充
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (row < merged.length) {
+                        const newValue = merged[row].value;
+                        const newPosition = GRID_SIZE - 1 - row;
+
+                        grid[newPosition][col] = newValue;
+
+                        // 如果是合并生成的新值，添加合并动画
+                        if (merged[row].merged) {
+                            const cellIndex = newPosition * GRID_SIZE + col;
+                            setTimeout(() => {
+                                cells[cellIndex].classList.add('merge-animation');
+
+                                // 计算合并方块的位置并显示动画
+                                const rect = cells[cellIndex].getBoundingClientRect();
+                                playScoreAnimation(newValue, rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+                                // 移除动画类
+                                setTimeout(() => {
+                                    cells[cellIndex].classList.remove('merge-animation');
+                                }, 300);
+                            }, 50);
+                        }
+                    } else {
+                        grid[GRID_SIZE - 1 - row][col] = 0;
+                    }
+                }
+
+                // 检查是否有变化
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (originalColumn[row] !== grid[row][col]) {
+                        moved = true;
+                        break;
+                    }
+                }
+            }
+
+            return { moved, score };
+        }
+
+
+        // 4. 更新moveLeft函数，在合并位置显示动画
+        function moveLeft(totalScore = 0) {
+            let moved = false;
+            let score = 0;
+
+            for (let row = 0; row < GRID_SIZE; row++) {
+                // 收集这一行中的所有非零数字
+                let nonZeros = [];
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (grid[row][col] !== 0) {
+                        nonZeros.push({
+                            value: grid[row][col],
+                            originalCol: col
+                        });
+                    }
+                }
+
+                // 如果这一行没有非零数字，继续下一行
+                if (nonZeros.length === 0) continue;
+
+                // 合并相同的相邻数字
+                let merged = [];
+                let i = 0;
+                while (i < nonZeros.length) {
+                    if (i + 1 < nonZeros.length && nonZeros[i].value === nonZeros[i + 1].value) {
+                        const mergeValue = nonZeros[i].value * 2;
+                        merged.push({
+                            value: mergeValue,
+                            merged: true,
+                            originalCol1: nonZeros[i].originalCol,
+                            originalCol2: nonZeros[i + 1].originalCol
+                        });
+
+                        // 计算合并得分
+                        score += mergeValue;
+
+                        i += 2;
+                    } else {
+                        merged.push({
+                            value: nonZeros[i].value,
+                            merged: false,
+                            originalCol: nonZeros[i].originalCol
+                        });
+                        i++;
+                    }
+                }
+
+                // 检查这一行是否有变化
+                let originalRow = [...grid[row]];
+
+                // 清除这一行并用合并后的数据填充
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (col < merged.length) {
+                        const newValue = merged[col].value;
+
+                        grid[row][col] = newValue;
+
+                        // 如果是合并生成的新值，添加合并动画
+                        if (merged[col].merged) {
+                            const cellIndex = row * GRID_SIZE + col;
+                            setTimeout(() => {
+                                cells[cellIndex].classList.add('merge-animation');
+
+                                // 计算合并方块的位置并显示动画
+                                const rect = cells[cellIndex].getBoundingClientRect();
+                                playScoreAnimation(newValue, rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+                                // 移除动画类
+                                setTimeout(() => {
+                                    cells[cellIndex].classList.remove('merge-animation');
+                                }, 300);
+                            }, 50);
+                        }
+                    } else {
+                        grid[row][col] = 0;
+                    }
+                }
+
+                // 检查是否有变化
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (originalRow[col] !== grid[row][col]) {
+                        moved = true;
+                        break;
+                    }
+                }
+            }
+
+            return { moved, score };
+        }
+
+        // 优化的游戏结束检查
+        function isGameOver() {
+            // 首先快速检查是否有空格
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (grid[row][col] === 0) return false;
+                }
+            }
+
+            // 检查相邻单元格是否有相同值
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const value = grid[row][col];
+                    // 只需检查右侧和下方
+                    if ((col < GRID_SIZE - 1 && value === grid[row][col + 1]) ||
+                        (row < GRID_SIZE - 1 && value === grid[row + 1][col])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // 显示游戏结束界面
+        function showGameOver() {
+            // 清理所有活动动画
+            activeAnimations.forEach(anim => {
+                if (document.body.contains(anim)) {
+                    document.body.removeChild(anim);
+                }
+            });
+            activeAnimations.clear();
+
+            // 播放游戏结束音效
+            playSound(gameOverSound);
+
+            const gameOver = document.createElement('div');
+            gameOver.className = 'game-over';
+
+            const heading = document.createElement('h2');
+            heading.textContent = 'Game Over!';
+
+            const scoreText = document.createElement('p');
+            scoreText.textContent = `Final Score: ${score}`;
+
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Play Again';
+            restartButton.onclick = newGame;
+
+            gameOver.appendChild(heading);
+            gameOver.appendChild(scoreText);
+            gameOver.appendChild(restartButton);
+
+            // 添加闪烁特效
+            const confetti = document.createElement('div');
+            confetti.style.position = 'absolute';
+            confetti.style.width = '100%';
+            confetti.style.height = '100%';
+            confetti.style.zIndex = '-1';
+            confetti.style.overflow = 'hidden';
+
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 10 + 5;
+                particle.style.position = 'absolute';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.background = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `floatUp ${1 + Math.random() * 2}s linear infinite`;
+                particle.style.animationDelay = Math.random() + 's';
+                confetti.appendChild(particle);
+            }
+
+            gameOver.appendChild(confetti);
+
+            const gridContainer = document.querySelector('.grid-container');
+            gridContainer.parentNode.appendChild(gameOver);
+        }
+
+        // 触摸滑动支持
+        let touchStartX, touchStartY;
+        const gridElement = document.getElementById('grid');
+
+        gridElement.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            e.preventDefault();
+        }, { passive: false });
+
+        gridElement.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        gridElement.addEventListener('touchend', (e) => {
+            if (!touchStartX || !touchStartY) return;
+
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+
+            // 判断滑动方向
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                // 水平滑动
+                if (diffX > 30) {
+                    move('right');
+                } else if (diffX < -30) {
+                    move('left');
+                }
+            } else {
+                // 垂直滑动
+                if (diffY > 30) {
+                    move('down');
+                } else if (diffY < -30) {
+                    move('up'); // 向上滑动也会触发"此操作无效"
+                }
+            }
+
+            touchStartX = null;
+            touchStartY = null;
+            e.preventDefault();
+        }, { passive: false });
+
+        // 键盘控制
+        document.addEventListener('keydown', e => {
+            if (gameIsOver) return;
+
+            const map = {
+                'ArrowLeft': 'left',
+                'ArrowRight': 'right',
+                'ArrowUp': 'up', // 保留映射，但会在move函数中被拦截
+                'ArrowDown': 'down'
+            };
+
+            if (map[e.key]) {
+                e.preventDefault(); // 防止滚动页面
+                move(map[e.key]);
+            }
+        });
+
+        // 初始化最高分
+        document.getElementById('best-score').textContent = bestScore;
+
+        // 初始化游戏
+        newGame();
+
+        // 预加载音频
+        window.addEventListener('load', function() {
+            // 预加载所有音频
+            moveSound.load();
+            mergeSound.load();
+            gameOverSound.load();
+        });
+    </script>
+</body>
+
+</html>
